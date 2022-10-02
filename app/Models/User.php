@@ -41,4 +41,28 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function relOrders()
+    {
+        return $this->hasMany(Orders::class, 'fk_user');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function latestOrder()
+    {
+        return $this->hasOne(Order::class, 'fk_user')->latestOfMany();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function oldestOrder()
+    {
+        return $this->hasOne(Order::class, 'fk_user')->oldestOfMany();
+    }
 }
