@@ -9,8 +9,6 @@ use Tests\TestCase;
 class ProductsTest extends TestCase
 {
     /**
-     * A basic feature test example.
-     *
      * @return void
      */
     public function test_the_route_return_products()
@@ -20,6 +18,9 @@ class ProductsTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * @return void
+     */
     public function test_the_route_return_products_structure()
     {
         $response = $this->get('/api/products');
@@ -32,6 +33,9 @@ class ProductsTest extends TestCase
         ]);
     }
 
+    /**
+     * @return void
+     */
     public function test_store_product()
     {
         $response = $this->post('/api/products', [
@@ -42,6 +46,9 @@ class ProductsTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * @return void
+     */
     public function test_update_product()
     {
         $this->post('/api/products', [
@@ -59,6 +66,9 @@ class ProductsTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * @return void
+     */
     public function test_delete_product()
     {
         $response = $this->delete('/api/products/1');
@@ -66,6 +76,9 @@ class ProductsTest extends TestCase
         $response->assertStatus(200);
     }
 
+    /**
+     * @return void
+     */
     public function test_store_product_validation()
     {
         $response = $this->post('/api/products', [
@@ -74,8 +87,12 @@ class ProductsTest extends TestCase
         ]);
 
         $response->assertStatus(302);
+        $response->assertSessionHasErrors(['name', 'description']);
     }
 
+    /**
+     * @return void
+     */
     public function test_update_product_validation()
     {
         $response = $this->put('/api/products/1', [
@@ -84,5 +101,6 @@ class ProductsTest extends TestCase
         ]);
 
         $response->assertStatus(302);
+        $response->assertSessionHasErrors(['name', 'description']);
     }
 }
