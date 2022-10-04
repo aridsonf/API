@@ -11,6 +11,9 @@ class Products extends Model
 
     protected $guarded = [];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function relStock()
     {
         return $this->hasMany(Stock::class, 'fk_product');
