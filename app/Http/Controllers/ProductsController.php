@@ -27,14 +27,24 @@ class ProductsController extends Controller
     public function store(StoreProductsRequest $request)
     {
         try {
-            Products::create([
-                'name' => $request->name,
-                'description' => $request->description ?? 'no description'
-            ]);
+            Products::create([$request->all()]);
 
             return response()->json('Product created successfully.');
         } catch (\Exception $ex) {
             return response()->json('Error adding product: ' . $ex, 500);
+        }
+    }
+
+    /**
+     * @param Products $products
+     * @return Products|\Illuminate\Http\JsonResponse
+     */
+    public function show(Products $products)
+    {
+        try {
+            return $products;
+        } catch (\Exception $ex) {
+            return response()->json('Error getting product: ' . $ex, 500);
         }
     }
 
