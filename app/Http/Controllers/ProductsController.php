@@ -27,7 +27,7 @@ class ProductsController extends Controller
     public function store(StoreProductsRequest $request)
     {
         try {
-            Products::create([$request->all()]);
+            Products::create($request->all());
 
             return response()->json('Product created successfully.');
         } catch (\Exception $ex) {
@@ -39,10 +39,11 @@ class ProductsController extends Controller
      * @param Products $products
      * @return Products|\Illuminate\Http\JsonResponse
      */
-    public function show(Products $products)
+    public function show(Products $products, string $id)
     {
         try {
-            return $products;
+            $product = $products->find($id);
+            return $product ?? response()->json('Product not found', 404);
         } catch (\Exception $ex) {
             return response()->json('Error getting product: ' . $ex, 500);
         }
@@ -53,14 +54,14 @@ class ProductsController extends Controller
      * @param Products $products
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateProductsRequest $request, Products $products)
+    public function update(UpdateProductsRequest $request, Products $products, string $id)
     {
         try {
-            $products->update([
-                'name' => $request->name,
-                'description' => $request->description ?? 'no description'
-            ]);
+            $product = $products->find($id);
 
+            if (!$product) return response()->json('Product not found', 404);
+
+            $product = $product->update($request->all());
             return response()->json('Product updated successfully.');
         } catch (\Exception $ex) {
             return response()->json('Error updating product: ' . $ex, 500);
@@ -71,11 +72,14 @@ class ProductsController extends Controller
      * @param Products $products
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Products $products)
+    public function destroy(Products $products, string $id)
     {
         try {
-            $products->delete();
+            $product = $products->find($id);
 
+            if (!$product) return response()->json('Product not found', 404);
+
+            $product->delete();
             return response()->json('Product deleted successfully.');
         } catch (\Exception $ex) {
             return response()->json('Error deleting product: ' . $ex, 500);
