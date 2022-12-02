@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Symfony\Component\HttpFoundation\Response;
 
 class UpdateProductsRequest extends FormRequest
 {
@@ -24,8 +27,8 @@ class UpdateProductsRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'description' => 'required'
+            'name' => 'sometimes|required',
+            'description' => 'sometimes|required'
         ];
     }
 
@@ -35,7 +38,7 @@ class UpdateProductsRequest extends FormRequest
     public function messages()
     {
         return [
-            'required' => ':attribute is required'
+            'required' => ":attribute can't be null"
         ];
     }
 
@@ -48,5 +51,22 @@ class UpdateProductsRequest extends FormRequest
             'name' => 'Name',
             'description' => 'Description'
         ];
+    }
+
+    /**
+    * Get the error messages for the defined validation rules.*
+    * @return array
+    */
+    public function failedValidation(Validator $validator)
+    {
+        $error_messages = $validator->errors()->all();
+        throw new HttpResponseException(
+            response()->json(
+                [
+                    'message' => $error_messages,
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            )
+        );
     }
 }
