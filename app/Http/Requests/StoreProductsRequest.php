@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Symfony\Component\HttpFoundation\Response;
 
 class StoreProductsRequest extends FormRequest
 {
@@ -48,5 +51,22 @@ class StoreProductsRequest extends FormRequest
             'name' => 'Name',
             'description' => 'Description'
         ];
+    }
+
+    /**
+    * Get the error messages for the defined validation rules.*
+    * @return array
+    */
+    public function failedValidation(Validator $validator)
+    {
+        $error_messages = $validator->errors()->all();
+        throw new HttpResponseException(
+            response()->json(
+                [
+                    'message' => $error_messages,
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            )
+        );
     }
 }
