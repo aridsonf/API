@@ -5,13 +5,14 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ProductsTest extends TestCase
 {
     /**
      * @return void
      */
-    public function test_the_route_return_products()
+    public function testListProducts()
     {
         $response = $this->get('/api/products');
 
@@ -21,7 +22,7 @@ class ProductsTest extends TestCase
     /**
      * @return void
      */
-    public function test_the_route_return_products_structure()
+    public function testListProductsStructure()
     {
         $response = $this->get('/api/products');
 
@@ -36,7 +37,7 @@ class ProductsTest extends TestCase
     /**
      * @return void
      */
-    public function test_store_product()
+    public function testSaveProduct()
     {
         $response = $this->post('/api/products', [
             'name' => 'Product 1',
@@ -49,7 +50,7 @@ class ProductsTest extends TestCase
     /**
      * @return void
      */
-    public function test_update_product()
+    public function testUpdateProduct()
     {
         $this->post('/api/products', [
             'name' => 'Product 1',
@@ -58,7 +59,7 @@ class ProductsTest extends TestCase
 
         $product = \App\Models\Products::orderBy('id', 'desc')->first();
 
-        $response = $this->put('/api/products/' . $product, [
+        $response = $this->put('/api/products/' . $product->id, [
             'name' => 'Product 1',
             'description' => 'Description 1'
         ]);
@@ -69,9 +70,16 @@ class ProductsTest extends TestCase
     /**
      * @return void
      */
-    public function test_delete_product()
+    public function testDeleteProduct()
     {
-        $response = $this->delete('/api/products/1');
+        $this->post('/api/products', [
+            'name' => 'Product 1',
+            'description' => 'Description 1'
+        ]);
+
+        $product = \App\Models\Products::orderBy('id', 'desc')->first();
+
+        $response = $this->delete('/api/products/' . $product->id);
 
         $response->assertStatus(200);
     }
@@ -79,28 +87,54 @@ class ProductsTest extends TestCase
     /**
      * @return void
      */
-    public function test_store_product_validation()
+    public function testSaveProductValidation()
     {
         $response = $this->post('/api/products', [
             'name' => '',
             'description' => ''
         ]);
 
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['name', 'description']);
+
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        $this->assertContains(
+            'Name is required',
+            $response->json()['message']
+        );
+
+        $this->assertContains(
+            'Description is required',
+            $response->json()['message']
+        );
     }
 
     /**
      * @return void
      */
-    public function test_update_product_validation()
+    public function testUpdateProductValidation()
     {
-        $response = $this->put('/api/products/1', [
+        $this->post('/api/products', [
+            'name' => 'Product 1',
+            'description' => 'Description 1'
+        ]);
+
+        $product = \App\Models\Products::orderBy('id', 'desc')->first();
+
+        $response = $this->put('/api/products/' . $product->id, [
             'name' => '',
             'description' => ''
         ]);
 
-        $response->assertStatus(302);
-        $response->assertSessionHasErrors(['name', 'description']);
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        $this->assertContains(
+            "Name can't be null",
+            $response->json()['message']
+        );
+
+        $this->assertContains(
+            "Description can't be null",
+            $response->json()['message']
+        );
     }
 }
