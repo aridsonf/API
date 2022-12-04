@@ -3,32 +3,28 @@
 namespace App\Doc\Controllers;
 
 
-class ProductsController
+class StockController
 {
     /**
      * @OA\Tag(
-     *      name="Products",
-     *      description="Products"
+     *      name="Stock",
+     *      description="Stock"
      * ),
      *
      * @OA\Get(
-     *     path="/prodcuts",
-     *     tags={"Products"},
-     *     summary="List all products",
-     *     operationId="listProducts",
+     *     path="/stock",
+     *     tags={"Stock"},
+     *     summary="List all stock",
+     *     operationId="listStock",
      *     @OA\Response(
      *         response=200,
      *         description="OK",
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(
-     *                 ref="#/components/schemas/Products")
+     *                 ref="#/components/schemas/Stock")
      *              ),
      *         ),
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
      *     )
      * )
      */
@@ -36,19 +32,62 @@ class ProductsController
     {
     }
 
+
+    /**
+     * @OA\Get(
+     *     path="/stock/{id}",
+     *     tags={"Stock"},
+     *     summary="Get a stock",
+     *     operationId="showStock",
+     *     @OA\Parameter(
+     *          name="id",
+     *          description="Stock id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int64"
+     *          ),
+     *          @OA\Examples(example="int", value="1", summary="An int value.")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="OK",
+     *         @OA\JsonContent(
+     *             ref="#/components/schemas/Stock"
+     *         ),
+     *     ),
+     *     @OA\Response(
+     *          response=404,
+     *          description="Stock not found"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Server error"
+     *     )
+     * )
+     */
+    public function show()
+    {
+    }
+
     /**
      * @OA\Post(
-     *     path="/prodcuts",
-     *     tags={"Products"},
-     *     summary="Create a product",
-     *     operationId="createProduct",
+     *     path="/stock",
+     *     tags={"Stock"},
+     *     summary="Create a stock",
+     *     operationId="createStock",
      *     @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/StoreProductsRequest")
+     *          @OA\JsonContent(ref="#/components/schemas/StoreStockRequest")
      *     ),
      *     @OA\Response(
      *         response=200,
      *         description="OK"
+     *     ),
+     *     @OA\Response(
+     *          response=404,
+     *          description="Product for stock not found"
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -73,52 +112,14 @@ class ProductsController
     }
 
     /**
-     * @OA\Get(
-     *     path="/prodcuts/{id}",
-     *     tags={"Products"},
-     *     summary="Get a product",
-     *     operationId="showProduct",
-     *     @OA\Parameter(
-     *          name="id",
-     *          description="Product id",
-     *          required=true,
-     *          in="path",
-     *          @OA\Schema(
-     *              type="integer",
-     *              format="int64"
-     *          ),
-     *          @OA\Examples(example="int", value="1", summary="An int value.")
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="OK",
-     *         @OA\JsonContent(
-     *             ref="#/components/schemas/Products"
-     *         ),
-     *     ),
-     *     @OA\Response(
-     *          response=404,
-     *          description="Product not found"
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Server error"
-     *     )
-     * )
-     */
-    public function show()
-    {
-    }
-
-    /**
      * @OA\Put(
-     *     path="/prodcuts/{id}",
-     *     tags={"Products"},
-     *     summary="Update a product",
-     *     operationId="updateProduct",
+     *     path="/stock/{id}",
+     *     tags={"Stock"},
+     *     summary="Update a stock",
+     *     operationId="updateStock",
      *     @OA\Parameter(
      *          name="id",
-     *          description="Product id",
+     *          description="Stock id",
      *          required=true,
      *          in="path",
      *          @OA\Schema(
@@ -129,7 +130,7 @@ class ProductsController
      *     ),
      *     @OA\RequestBody(
      *          required=true,
-     *          @OA\JsonContent(ref="#/components/schemas/UpdateProductsRequest")
+     *          @OA\JsonContent(ref="#/components/schemas/UpdateStockRequest")
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -137,7 +138,11 @@ class ProductsController
      *     ),
      *     @OA\Response(
      *          response=404,
-     *          description="Product not found"
+     *          description="Stock not found"
+     *     ),
+     *     @OA\Response(
+     *          response=406,
+     *          description="Stock balance higher than the initial balance"
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -163,13 +168,13 @@ class ProductsController
 
     /**
      * @OA\Delete(
-     *     path="/prodcuts/{id}",
-     *     tags={"Products"},
-     *     summary="Delete a product",
-     *     operationId="deleteProduct",
+     *     path="/stock/{id}",
+     *     tags={"Stock"},
+     *     summary="Delete a stock",
+     *     operationId="deleteStock",
      *     @OA\Parameter(
      *          name="id",
-     *          description="Product id",
+     *          description="Stock id",
      *          required=true,
      *          in="path",
      *          @OA\Schema(
@@ -184,11 +189,7 @@ class ProductsController
      *     ),
      *     @OA\Response(
      *          response=404,
-     *          description="Product not found"
-     *     ),
-     *     @OA\Response(
-     *          response=406,
-     *          description="Product can't be deleted"
+     *          description="Stock not found"
      *     ),
      *     @OA\Response(
      *         response=500,
