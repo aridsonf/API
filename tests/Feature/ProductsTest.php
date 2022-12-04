@@ -28,8 +28,11 @@ class ProductsTest extends TestCase
 
         $response->assertJsonStructure([
             '*' => [
+                'id',
                 'name',
                 'description',
+                'created_at',
+                'updated_at',
             ]
         ]);
     }

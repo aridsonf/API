@@ -87,8 +87,7 @@ class ProductsController extends Controller
             if (!$product) return response()->json('Product not found.', 404);
 
             $stocks = Stock::where('fk_product', $id)->get();
-            if (!empty($stocks))
-                return response()->json("Can't delete the product how has some stock attached.", 406);
+            if (!$stocks) return response()->json("Can't delete the product how has some stock attached.", 406);
 
             $product->delete();
             return response()->json('Product deleted successfully.');
