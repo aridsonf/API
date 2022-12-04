@@ -9,7 +9,7 @@ class ProductsController
      * @OA\Tag(
      *      name="Products",
      *      description="Products"
-     *  ),
+     * ),
      *
      * @OA\Get(
      *     path="/prodcuts",
@@ -45,7 +45,7 @@ class ProductsController
      *     @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(ref="#/components/schemas/StoreProductsRequest")
-     *      ),
+     *     ),
      *     @OA\Response(
      *         response=200,
      *         description="OK"
