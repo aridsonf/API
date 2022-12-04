@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Symfony\Component\HttpFoundation\Response;
 
 class StoreStockRequest extends FormRequest
 {
@@ -13,7 +16,7 @@ class StoreStockRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -25,8 +28,8 @@ class StoreStockRequest extends FormRequest
     {
         return [
             'fk_product' => 'required',
-            'value' => 'required|numeric',
-            'inbound' => 'required|numeric',
+            'value' => 'required|numeric|gt:0',
+            'inbound' => 'required|numeric|integer|gt:0',
             'validate_date' => 'required|date'
         ];
     }
@@ -39,7 +42,9 @@ class StoreStockRequest extends FormRequest
         return [
             'required' => ':attribute is required',
             'numeric' => ':attribute has to be a number',
-            'date' => ':attribute has to be a date'
+            'date' => ':attribute has to be a date',
+            'gt' => ':attribute has to be greater than :value',
+            'integer' => ':attribute must to be a integer'
         ];
     }
 
@@ -49,10 +54,29 @@ class StoreStockRequest extends FormRequest
     public function attributes()
     {
         return [
-            'validate_date' => 'Validate',
             'fk_product' => 'Product',
+            'validate_date' => 'Validate',
             'value' => 'Value',
-            'inbound' => 'Stock Quantity'
+            'inbound' => 'Initial Stock Quantity'
         ];
+    }
+
+    /**
+     * Summary of failedValidation
+     * @param Validator $validator
+     * @throws HttpResponseException
+     * @return never
+     */
+    public function failedValidation(Validator $validator)
+    {
+        $error_messages = $validator->errors()->all();
+        throw new HttpResponseException(
+            response()->json(
+                [
+                    'message' => $error_messages,
+                ],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            )
+        );
     }
 }

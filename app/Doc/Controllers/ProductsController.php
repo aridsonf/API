@@ -187,6 +187,10 @@ class ProductsController
      *          description="Product not found"
      *     ),
      *     @OA\Response(
+     *          response=406,
+     *          description="Product can't be deleted"
+     *     ),
+     *     @OA\Response(
      *         response=500,
      *         description="Server error"
      *     )

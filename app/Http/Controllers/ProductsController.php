@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProductsRequest;
 use App\Http\Requests\UpdateProductsRequest;
 use App\Models\Products;
+use App\Models\Stock;
 
 class ProductsController extends Controller
 {
@@ -15,8 +16,8 @@ class ProductsController extends Controller
     {
         try {
             return Products::all();
-        } catch (\Exception $ex) {
-            return response()->json('Error listing product: ' . $ex, 500);
+        } catch (\Throwable $th) {
+            return response()->json('Error listing product: ' . $th->getMessage(), 500);
         }
     }
 
@@ -30,28 +31,32 @@ class ProductsController extends Controller
             Products::create($request->all());
 
             return response()->json('Product created successfully.');
-        } catch (\Exception $ex) {
-            return response()->json('Error adding product: ' . $ex, 500);
+        } catch (\Throwable $th) {
+            return response()->json('Error adding product: ' . $th->getMessage(), 500);
         }
     }
 
     /**
+     * Summary of show
      * @param Products $products
-     * @return Products|\Illuminate\Http\JsonResponse
+     * @param string $id
+     * @return mixed
      */
     public function show(Products $products, string $id)
     {
         try {
             $product = $products->find($id);
-            return $product ?? response()->json('Product not found', 404);
-        } catch (\Exception $ex) {
-            return response()->json('Error getting product: ' . $ex, 500);
+            return $product ?? response()->json('Product not found.', 404);
+        } catch (\Throwable $th) {
+            return response()->json('Error getting product: ' . $th->getMessage(), 500);
         }
     }
 
     /**
+     * Summary of update
      * @param UpdateProductsRequest $request
      * @param Products $products
+     * @param string $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(UpdateProductsRequest $request, Products $products, string $id)
@@ -59,17 +64,19 @@ class ProductsController extends Controller
         try {
             $product = $products->find($id);
 
-            if (!$product) return response()->json('Product not found', 404);
+            if (!$product) return response()->json('Product not found.', 404);
 
-            $product = $product->update($request->all());
+            $product->update($request->all());
             return response()->json('Product updated successfully.');
-        } catch (\Exception $ex) {
-            return response()->json('Error updating product: ' . $ex, 500);
+        } catch (\Throwable $th) {
+            return response()->json('Error updating product: ' . $th->getMessage(), 500);
         }
     }
 
     /**
+     * Summary of destroy
      * @param Products $products
+     * @param string $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Products $products, string $id)
@@ -77,12 +84,16 @@ class ProductsController extends Controller
         try {
             $product = $products->find($id);
 
-            if (!$product) return response()->json('Product not found', 404);
+            if (!$product) return response()->json('Product not found.', 404);
+
+            $stocks = Stock::where('fk_product', $id)->get();
+            if (!empty($stocks))
+                return response()->json("Can't delete the product how has some stock attached.", 406);
 
             $product->delete();
             return response()->json('Product deleted successfully.');
-        } catch (\Exception $ex) {
-            return response()->json('Error deleting product: ' . $ex, 500);
+        } catch (\Throwable $th) {
+            return response()->json('Error deleting product: ' . $th->getMessage(), 500);
         }
     }
 }
