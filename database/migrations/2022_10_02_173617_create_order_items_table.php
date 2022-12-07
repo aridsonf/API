@@ -18,7 +18,7 @@ class CreateOrderItemsTable extends Migration
             $table->biginteger('fk_order')->unsigned();
             $table->foreign('fk_order')->references('id')->on('orders')->onDelete('cascade')->onUpdate('cascade');
             $table->biginteger('fk_stock')->unsigned();
-            $table->foreign('fk_stock')->references('id')->on('products')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreign('fk_stock')->references('id')->on('stocks')->onDelete('cascade')->onUpdate('cascade');
             $table->integer('product_quantity');
             $table->timestamps();
         });
