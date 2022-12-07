@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderItemsRequest;
 use App\Http\Requests\UpdateOrderItemsRequest;
 use App\Models\OrderItems;
+use App\Models\Stock;
 
 class OrderItemsController extends Controller
 {
@@ -29,12 +30,32 @@ class OrderItemsController extends Controller
     public function store(StoreOrderItemsRequest $request)
     {
         try {
+            $this->attStockReserve(
+                $request->fk_stock,
+                $request->product_quantity
+            );
+
             OrderItems::create($request->all());
 
             return response()->json('Item created successfully.');
         } catch (\Throwable $th) {
             return response()->json('Error adding item: ' . $th->getMessage(), 500);
         }
+    }
+
+    /**
+     * Summary of attStockReserve
+     * @param string $id
+     * @param int $quantity
+     * @return void
+     */
+    public function attStockReserve(string $id, int $quantity): void
+    {
+        $stock = Stock::find($id);
+
+        $stock->update([
+            'reserved' => $stock['reserved'] + $quantity
+        ]);
     }
 
     /**
@@ -63,11 +84,21 @@ class OrderItemsController extends Controller
     public function update(UpdateOrderItemsRequest $request, OrderItems $orderItems, string $id)
     {
         try {
+            $this->attStockReserve(
+                $request->fk_stock,
+                $request->product_quantity
+            );
+
             $item = $orderItems->find($id);
 
             if (!$item) return response()->json('Item not found.', 404);
 
-            $item->update($request->all());
+            if ($request->product_quantity === 0) {
+                $item->delete();
+            } else {
+                $item->update($request->all());
+            }
+
             return response()->json('Item updated successfully.');
         } catch (\Throwable $th) {
             return response()->json('Error updating item: ' . $th->getMessage(), 500);
